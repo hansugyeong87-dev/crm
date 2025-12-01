@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">고객 목록</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            {% if customer %}고객 정보 수정{% else %}새 고객 추가{% endif %}
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="mb-0">
+                                {% if customer %}
+                                    <i class="bi bi-person-gear me-2"></i>고객 정보 수정
+                                {% else %}
+                                    <i class="bi bi-person-plus me-2"></i>새 고객 추가
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted">필수 항목(*)을 모두 입력해주세요.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">이름 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ customer.name if customer else '' }}" required>
+                                <div class="invalid-feedback">
+                                    이름을 입력해주세요.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">전화번호</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ customer.phone if customer else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="email" class="form-label">이메일</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ customer.email if customer else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="company" class="form-label">회사명</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                <input type="text" class="form-control" id="company" name="company" 
+                                       value="{{ customer.company if customer else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="position" class="form-label">직책</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                <input type="text" class="form-control" id="position" name="position" 
+                                       value="{{ customer.position if customer else '' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="memo" class="form-label">메모</label>
+                            <textarea class="form-control" id="memo" name="memo" rows="3" 
+                                     placeholder="고객에 대한 추가 정보를 입력하세요">{{ customer.memo if customer else '' }}</textarea>
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> 취소
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    {% if customer %}
+                                        <i class="bi bi-check-circle me-1"></i> 저장하기
+                                    {% else %}
+                                        <i class="bi bi-plus-circle me-1"></i> 추가하기
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// 전화번호 포맷팅
+const phoneInput = document.getElementById('phone');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 10) {
+            value = value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        } else if (value.length > 7) {
+            value = value.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+        } else if (value.length > 3) {
+            value = value.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+        } else if (value.length > 0) {
+            value = value.replace(/(\d*)/, '$1');
+        }
+        
+        e.target.value = value;
+    });
+}
+</script>
+{% endblock %}
